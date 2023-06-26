@@ -1,0 +1,42 @@
+﻿<Window x:Class="ScriptPlayer.Dialogs.GeneratorProgressDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:generators="clr-namespace:ScriptPlayer.Generators"
+        DataContext="{Binding RelativeSource={RelativeSource Mode=Self}}"
+        mc:Ignorable="d" Closing="GeneratorProgressDialog_OnClosing"
+        Loaded="GeneratorProgressDialog_OnLoaded"
+        Title="Generator Progress" Height="452" Width="792">
+    <Window.TaskbarItemInfo>
+        <TaskbarItemInfo ProgressState="Normal" ProgressValue="{Binding WorkQueue.TotalProgress}"/>
+    </Window.TaskbarItemInfo>
+    <Window.Resources>
+        <ContextMenu x:Key="RowContextMenu">
+            <MenuItem Header="Cancel" Click="MnuCancel_Click"/>
+        </ContextMenu>
+    </Window.Resources>
+    <Grid>
+        <DataGrid Name="dataGrid" AutoGenerateColumns="False" ItemsSource="{Binding WorkQueue.Entries}" IsReadOnly="True" Margin="10,10,10,35">
+            <DataGrid.Columns>
+                <DataGridTextColumn Width="4*" Header="Video" Binding="{Binding Path=Filename, Mode=OneWay}"/>
+                <DataGridTextColumn Width="1*" Header="Type" Binding="{Binding Path=Type, Mode=OneWay}"/>
+                <DataGridTextColumn Width="1*" Header="Status" Binding="{Binding Path=Status, Mode=OneWay}"/>
+                <DataGridTemplateColumn Width="2*" Header="Progress">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate DataType="{x:Type generators:GeneratorEntry}">
+                            <ProgressBar HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Maximum="1" Value="{Binding Path=Progress, Mode=OneWay}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </DataGrid.Columns>
+            <DataGrid.RowStyle>
+                <Style TargetType="DataGridRow">
+                    <Setter Property="ContextMenu" Value="{StaticResource RowContextMenu}"/>
+                </Style>
+            </DataGrid.RowStyle>
+        </DataGrid>
+        <Button Content="Remove Completed" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="132" Click="btnRemoveDone_Click"/>
+        <CheckBox IsChecked="{Binding CloseWhenDone}" Content="Close when done" HorizontalAlignment="Right" Margin="0,0,157,12" VerticalAlignment="Bottom"/>
+    </Grid>
+</Window>

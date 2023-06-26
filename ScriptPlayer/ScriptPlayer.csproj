@@ -1,0 +1,628 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProjectGuid>{9B1B8C89-4AFE-47D4-B834-41673A672DDE}</ProjectGuid>
+    <OutputType>WinExe</OutputType>
+    <RootNamespace>ScriptPlayer</RootNamespace>
+    <AssemblyName>ScriptPlayer</AssemblyName>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+    <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <WarningLevel>4</WarningLevel>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
+    <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <Prefer32Bit>false</Prefer32Bit>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationIcon>ScriptPlayerIcon.ico</ApplicationIcon>
+  </PropertyGroup>
+  <PropertyGroup>
+    <StartupObject>ScriptPlayer.App</StartupObject>
+  </PropertyGroup>
+  <PropertyGroup>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="FMUtils.KeyboardHook, Version=1.0.140.2145, Culture=neutral, PublicKeyToken=1acd76c568cde84e, processorArchitecture=MSIL">
+      <HintPath>..\packages\FMUtils.KeyboardHook.1.0.140.2145\lib\net40-Client\FMUtils.KeyboardHook.dll</HintPath>
+    </Reference>
+    <Reference Include="HtmlAgilityPack, Version=1.11.43.0, Culture=neutral, PublicKeyToken=bd319b19eaf3b43a, processorArchitecture=MSIL">
+      <HintPath>..\packages\HtmlAgilityPack.1.11.43\lib\Net45\HtmlAgilityPack.dll</HintPath>
+    </Reference>
+    <Reference Include="JetBrains.Annotations, Version=4242.42.42.42, Culture=neutral, PublicKeyToken=1010a0d8d6380325, processorArchitecture=MSIL">
+      <HintPath>..\packages\JetBrains.Annotations.2022.1.0\lib\net20\JetBrains.Annotations.dll</HintPath>
+    </Reference>
+    <Reference Include="MediaInfo.Wrapper, Version=21.9.2.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\MediaInfo.Wrapper.21.9.2\lib\net45\MediaInfo.Wrapper.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="Microsoft.VisualBasic" />
+    <Reference Include="Microsoft.Win32.Registry, Version=4.1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.Win32.Registry.4.7.0\lib\net461\Microsoft.Win32.Registry.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.WindowsAPICodePack-Core.1.1.0.2\lib\Microsoft.WindowsAPICodePack.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.Shell, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.WindowsAPICodePack-Shell.1.1.0.0\lib\Microsoft.WindowsAPICodePack.Shell.dll</HintPath>
+    </Reference>
+    <Reference Include="Microsoft.WindowsAPICodePack.ShellExtensions, Version=1.1.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Microsoft.WindowsAPICodePack-Shell.1.1.0.0\lib\Microsoft.WindowsAPICodePack.ShellExtensions.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio, Version=2.1.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
+      <HintPath>..\packages\NAudio.2.1.0\lib\net472\NAudio.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio.Asio, Version=2.1.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
+      <HintPath>..\packages\NAudio.Asio.2.1.0\lib\netstandard2.0\NAudio.Asio.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio.Core, Version=2.1.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
+      <HintPath>..\packages\NAudio.Core.2.1.0\lib\netstandard2.0\NAudio.Core.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio.Midi, Version=2.1.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
+      <HintPath>..\packages\NAudio.Midi.2.1.0\lib\netstandard2.0\NAudio.Midi.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio.Wasapi, Version=2.1.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
+      <HintPath>..\packages\NAudio.Wasapi.2.1.0\lib\netstandard2.0\NAudio.Wasapi.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio.WinForms, Version=2.1.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
+      <HintPath>..\packages\NAudio.WinForms.2.1.0\lib\net472\NAudio.WinForms.dll</HintPath>
+    </Reference>
+    <Reference Include="NAudio.WinMM, Version=2.1.0.0, Culture=neutral, PublicKeyToken=e279aa5131008a41, processorArchitecture=MSIL">
+      <HintPath>..\packages\NAudio.WinMM.2.1.0\lib\netstandard2.0\NAudio.WinMM.dll</HintPath>
+    </Reference>
+    <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="Octokit, Version=0.51.0.0, Culture=neutral, processorArchitecture=MSIL">
+      <HintPath>..\packages\Octokit.0.51.0\lib\net46\Octokit.dll</HintPath>
+    </Reference>
+    <Reference Include="System" />
+    <Reference Include="System.ComponentModel.Composition" />
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Drawing" />
+    <Reference Include="System.IO.Compression" />
+    <Reference Include="System.Net" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Runtime.Serialization" />
+    <Reference Include="System.Security.AccessControl, Version=4.1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.AccessControl.4.7.0\lib\net461\System.Security.AccessControl.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Security.Principal.Windows, Version=4.1.3.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL">
+      <HintPath>..\packages\System.Security.Principal.Windows.4.7.0\lib\net461\System.Security.Principal.Windows.dll</HintPath>
+    </Reference>
+    <Reference Include="System.Web" />
+    <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Xaml">
+      <RequiredTargetFramework>4.0</RequiredTargetFramework>
+    </Reference>
+    <Reference Include="Windows, Version=255.255.255.255, Culture=neutral, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>C:\Program Files (x86)\Windows Kits\10\UnionMetadata\10.0.17763.0\Windows.winmd</HintPath>
+    </Reference>
+    <Reference Include="WindowsBase" />
+    <Reference Include="PresentationCore" />
+    <Reference Include="PresentationFramework" />
+  </ItemGroup>
+  <ItemGroup>
+    <ApplicationDefinition Include="App.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </ApplicationDefinition>
+    <Compile Include="Controls\CutoutPreview.cs" />
+    <Compile Include="Controls\HorizontalStretcher.cs" />
+    <Compile Include="Controls\PlaylistControl.xaml.cs">
+      <DependentUpon>PlaylistControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\VideoDetailsPreview.xaml.cs">
+      <DependentUpon>VideoDetailsPreview.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Controls\VirtualizingWrapPanel.cs" />
+    <Compile Include="Converters\AlternativeValueConverter.cs" />
+    <Compile Include="Converters\InverterConverter.cs" />
+    <Compile Include="Dialogs\CompactControlWindow.xaml.cs">
+      <DependentUpon>CompactControlWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\DirectorySelectorDialog.xaml.cs">
+      <DependentUpon>DirectorySelectorDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\EditFavouriteFolderDialog.xaml.cs">
+      <DependentUpon>EditFavouriteFolderDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\EditMetaDataDialog.xaml.cs">
+      <DependentUpon>EditMetaDataDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\FunstimDeviceSelector.xaml.cs">
+      <DependentUpon>FunstimDeviceSelector.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\AudioDeviceSelector.xaml.cs">
+      <DependentUpon>AudioDeviceSelector.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\GoProVrPlayerConnectionSettingsDialog.xaml.cs">
+      <DependentUpon>GoProVrPlayerConnectionSettingsDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\HandyDeviceIdSettingsDialog.xaml.cs">
+      <DependentUpon>HandyDeviceIdSettingsDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\RelatedFilesDialog.xaml.cs">
+      <DependentUpon>RelatedFilesDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\RenameDialog.xaml.cs">
+      <DependentUpon>RenameDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\SerialPortSelector.xaml.cs">
+      <DependentUpon>SerialPortSelector.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModels\DependecyObjectExtensions.cs" />
+    <Compile Include="Dialogs\GeneratorSettingsDialog.xaml.cs">
+      <DependentUpon>GeneratorSettingsDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\SectionDialog.xaml.cs">
+      <DependentUpon>SectionDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\TimeShiftDialog.xaml.cs">
+      <DependentUpon>TimeShiftDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\GeneratorResult.cs" />
+    <Compile Include="Generators\HeatmapGenerator.cs" />
+    <Compile Include="Generators\HeatmapGeneratorSettings.cs" />
+    <Compile Include="Generators\ThumbnailBannerGeneratorSettings.cs" />
+    <Compile Include="Generators\ThumbnailBannerGenerator.cs" />
+    <Compile Include="Generators\ThumbnailBannerGeneratorData.cs" />
+    <Compile Include="Generators\ThumbnailBannerGeneratorImage.cs" />
+    <Compile Include="Generators\FfmpegGenerator.cs" />
+    <Compile Include="Generators\FfmpegGeneratorSettings.cs" />
+    <Compile Include="Converters\BooleanAndConverter.cs" />
+    <Compile Include="Converters\CollectionNullOrEmptyToVisibilityConverter.cs" />
+    <Compile Include="Converters\DurationConverter.cs" />
+    <Compile Include="Converters\EqualsConverter.cs" />
+    <Compile Include="Dialogs\AttributionDialog.xaml.cs">
+      <DependentUpon>AttributionDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\GeneratorEntry.cs" />
+    <Compile Include="Generators\GeneratorJob.cs" />
+    <Compile Include="Dialogs\GeneratorProgressDialog.xaml.cs">
+      <DependentUpon>GeneratorProgressDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\JobDoneTypes.cs" />
+    <Compile Include="Generators\JobStates.cs" />
+    <Compile Include="Generators\PreviewGenerator.cs" />
+    <Compile Include="Generators\GeneratorWorkQueue.cs" />
+    <Compile Include="Generators\IGenerator.cs" />
+    <Compile Include="Dialogs\PreviewGeneratorDialog.xaml.cs">
+      <DependentUpon>PreviewGeneratorDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\PreviewGeneratorSettings.cs" />
+    <Compile Include="Dialogs\ThumbnailBannerGeneratorSettingsDialog.xaml.cs">
+      <DependentUpon>ThumbnailBannerGeneratorSettingsDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\ThumbnailBannerGeneratorSettingsPreviewDialog.xaml.cs">
+      <DependentUpon>ThumbnailBannerGeneratorSettingsPreviewDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\ThumbnailGenerator.cs" />
+    <Compile Include="Dialogs\KodiConnectionSettingsDialog.xaml.cs">
+      <DependentUpon>KodiConnectionSettingsDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\PreviewGeneratorSettings.xaml.cs">
+      <DependentUpon>PreviewGeneratorSettings.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\SceneSelectorDialog.xaml.cs">
+      <DependentUpon>SceneSelectorDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\ShortcutInputDialog.xaml.cs">
+      <DependentUpon>ShortcutInputDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\ThumbnailGeneratorSettings.cs" />
+    <Compile Include="Dialogs\ThumbnailGeneratorSettingsDialog.xaml.cs">
+      <DependentUpon>ThumbnailGeneratorSettingsDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Generators\TimeFrame.cs" />
+    <Compile Include="Generators\ThumbnailProgressEntry.cs" />
+    <Compile Include="Dialogs\ZoomPlayerConnectionSettingsDialog.xaml.cs">
+      <DependentUpon>ZoomPlayerConnectionSettingsDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\SimpleTcpConnectionSettingsDialog.xaml.cs">
+      <DependentUpon>SimpleTcpConnectionSettingsDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\SamsungVrConnectionSettingsDialog.xaml.cs">
+      <DependentUpon>SamsungVrConnectionSettingsDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="FlashOverlay.xaml.cs">
+      <DependentUpon>FlashOverlay.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="ViewModels\ChapterMode.cs" />
+    <Compile Include="ViewModels\CommandLineSplitter.cs" />
+    <Compile Include="ViewModels\CommandSection.cs" />
+    <Compile Include="ViewModels\Constants.cs" />
+    <Compile Include="ViewModels\EventArgs.cs" />
+    <Compile Include="ViewModels\ExistingFileStrategy.cs" />
+    <Compile Include="ViewModels\GeneralGeneratorSettingsViewModel.cs" />
+    <Compile Include="ViewModels\GeneratorSettingsViewModel.cs" />
+    <Compile Include="ViewModels\HeatmapGeneratorSettingsViewModel.cs" />
+    <Compile Include="ViewModels\InstanceHandler.cs" />
+    <Compile Include="ViewModels\KeyAndModifiers.cs" />
+    <Compile Include="ViewModels\MainViewModel.Commands.cs" />
+    <Compile Include="ViewModels\PlaybackMode.cs" />
+    <Compile Include="ViewModels\PlayerStateModel.cs" />
+    <Compile Include="ViewModels\PlaylistViewStyle.cs" />
+    <Compile Include="ViewModels\PreviewGeneratorSettingsViewModel.cs" />
+    <Compile Include="ViewModels\SettingsPage.cs" />
+    <Compile Include="ViewModels\SettingsViewModel.cs" />
+    <Compile Include="ViewModels\SkipState.cs" />
+    <Compile Include="ViewModels\ThumbnailBannerGeneratorSettingsViewModel.cs" />
+    <Compile Include="ViewModels\ThumbnailGeneratorSettingsViewModel.cs" />
+    <Compile Include="ViewModels\TimeDisplayMode.cs" />
+    <Compile Include="ViewModels\VersionViewModel.cs" />
+    <Compile Include="Converters\DeviceToImageConverter.cs" />
+    <Compile Include="Converters\DistinctValueToBooleanConverter.cs" />
+    <Compile Include="Converters\TimeLeftConverter.cs" />
+    <Compile Include="Converters\TimeSpanToMillisecondsConverter.cs" />
+    <Compile Include="Dialogs\ButtplugConnectionSettingsDialog.xaml.cs">
+      <DependentUpon>ButtplugConnectionSettingsDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\DeviceManagerDialog.xaml.cs">
+      <DependentUpon>DeviceManagerDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\ScriptDownloadDialog.xaml.cs">
+      <DependentUpon>ScriptDownloadDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\SettingsDialog.xaml.cs">
+      <DependentUpon>SettingsDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\VersionDialog.xaml.cs">
+      <DependentUpon>VersionDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\WhirligigConnectionSettingsDialog.xaml.cs">
+      <DependentUpon>WhirligigConnectionSettingsDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialogs\VlcConnectionSettingsDialog.xaml.cs">
+      <DependentUpon>VlcConnectionSettingsDialog.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="CommandSource.cs" />
+    <Compile Include="ViewModels\ButtplugUrlRequestEventArgs.cs" />
+    <Compile Include="ViewModels\DeviceViewModel.cs" />
+    <Compile Include="ViewModels\MessageBoxEventArgs.cs" />
+    <Compile Include="ViewModels\PlaylistEntry.cs" />
+    <Compile Include="ViewModels\MainViewModel.cs" />
+    <Compile Include="ViewModels\PlaylistViewModel.cs" />
+    <Compile Include="ViewModels\PositionFilterMode.cs" />
+    <Compile Include="ViewModels\RequestEventArgs.cs" />
+    <Compile Include="ViewModels\RequestFileEventArgs.cs" />
+    <Compile Include="ViewModels\TestPatternDefinition.cs" />
+    <Page Include="Controls\PlaylistControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Controls\VideoDetailsPreview.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\AttributionDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\CompactControlWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\DirectorySelectorDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\EditFavouriteFolderDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\EditMetaDataDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\FunstimDeviceSelector.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialogs\AudioDeviceSelector.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\ButtplugConnectionSettingsDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\GeneratorProgressDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\GeneratorSettingsDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\GoProVrPlayerConnectionSettingsDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialogs\HandyDeviceIdSettingsDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\PreviewGeneratorDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\RelatedFilesDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\RenameDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\SectionDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\SerialPortSelector.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialogs\ThumbnailBannerGeneratorSettingsDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\ThumbnailBannerGeneratorSettingsPreviewDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\DeviceManagerDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\KodiConnectionSettingsDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\PreviewGeneratorSettings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\SceneSelectorDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\ShortcutInputDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\ThumbnailGeneratorSettingsDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\TimeShiftDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\ZoomPlayerConnectionSettingsDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialogs\ScriptDownloadDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\SettingsDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\VersionDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Dialogs\SimpleTcpConnectionSettingsDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialogs\SamsungVrConnectionSettingsDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialogs\WhirligigConnectionSettingsDialog.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Dialogs\VlcConnectionSettingsDialog.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="FlashOverlay.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="MainWindow.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Compile Include="App.xaml.cs">
+      <DependentUpon>App.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="MainWindow.xaml.cs">
+      <DependentUpon>MainWindow.xaml</DependentUpon>
+      <SubType>Code</SubType>
+    </Compile>
+    <Page Include="Dialogs\PlaylistWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Dialogs\PlaylistWindow.xaml.cs">
+      <DependentUpon>PlaylistWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\AssemblyInfo.cs">
+      <SubType>Code</SubType>
+    </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
+    <Compile Include="Properties\Settings.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DependentUpon>Settings.settings</DependentUpon>
+      <DesignTimeSharedInput>True</DesignTimeSharedInput>
+    </Compile>
+    <EmbeddedResource Include="Properties\Resources.resx">
+      <Generator>ResXFileCodeGenerator</Generator>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+    </EmbeddedResource>
+    <None Include="app.manifest" />
+    <None Include="packages.config">
+      <SubType>Designer</SubType>
+    </None>
+    <None Include="Properties\Settings.settings">
+      <Generator>SettingsSingleFileGenerator</Generator>
+      <LastGenOutput>Settings.Designer.cs</LastGenOutput>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\ScriptPlayer.Ipc\ScriptPlayer.Ipc.csproj">
+      <Project>{1c299420-2055-48d6-8db7-e297709cc9d3}</Project>
+      <Name>ScriptPlayer.Ipc</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\ScriptPlayer.Shared\ScriptPlayer.Shared.csproj">
+      <Project>{E6533970-6370-4CDE-B7A8-A9E3F15BF26A}</Project>
+      <Name>ScriptPlayer.Shared</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="ScriptPlayerIcon.ico" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\ScriptPlayerIcon.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Licenses\FMUtils.KeyboardHook.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Licenses\FolderBrowserDialogEx.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Licenses\JetBrains.Annotations.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Licenses\Newtonsoft.Json.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Licenses\NLog.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Licenses\Octokit.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Licenses\Buttplug.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Licenses\deniszykov.WebSocketListener.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Licenses\HtmlAgilityPack.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Licenses\MediaInfo.Native.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Licenses\MediaInfo.Wrapper.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Licenses\NJsonSchema.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Licenses\SuperSocket.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Licenses\WebSocket4Net.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Licenses\YamlDotNet.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Licenses\ScriptPlayer.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Licenses\FontAwesome.txt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="Images\VideoPreview.png" />
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <Import Project="..\packages\MediaInfo.Native.21.9.1\build\MediaInfo.Native.targets" Condition="Exists('..\packages\MediaInfo.Native.21.9.1\build\MediaInfo.Native.targets')" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\packages\MediaInfo.Native.21.9.1\build\MediaInfo.Native.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\MediaInfo.Native.21.9.1\build\MediaInfo.Native.targets'))" />
+  </Target>
+</Project>

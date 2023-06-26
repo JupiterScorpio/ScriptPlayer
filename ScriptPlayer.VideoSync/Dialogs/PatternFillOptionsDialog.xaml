@@ -1,0 +1,57 @@
+﻿<Window x:Class="ScriptPlayer.VideoSync.Dialogs.PatternFillOptionsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ScriptPlayer.VideoSync.Dialogs"
+        xmlns:System="clr-namespace:System;assembly=mscorlib"
+        xmlns:controls="clr-namespace:ScriptPlayer.VideoSync.Controls"
+        mc:Ignorable="d" DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        Title="Pattern Fill Options" Height="374.979" Width="446.22" Loaded="Window_Loaded">
+    <Grid>
+        <ItemsControl Margin="10,247,10,35" ItemsSource="{Binding Beats}" Background="LightGray">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal"/>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate DataType="{x:Type local:IndexedBoolean}">
+                    <CheckBox VerticalAlignment="Bottom" IsChecked="{Binding Value}" Content="{Binding Caption}" IsEnabled="{Binding CanEdit}">
+                        <CheckBox.LayoutTransform>
+                            <RotateTransform Angle="-90"></RotateTransform>
+                        </CheckBox.LayoutTransform>
+                    </CheckBox>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+        <TextBlock HorizontalAlignment="Left" Margin="10,10,0,0" TextWrapping="Wrap" Text="Recently used:" VerticalAlignment="Top" RenderTransformOrigin="0.641,0.578" Width="195"/>
+        <ListBox x:Name="lstPatterns" Margin="10,31,10,102" ItemsSource="{Binding RecentlyUsedPatterns}" SelectionChanged="ListBox_SelectionChanged">
+            <ListBox.ItemContainerStyle>
+                <Style TargetType="{x:Type ListBoxItem}">
+                    <Setter Property="HorizontalContentAlignment" Value="Stretch"/>
+                    <Setter Property="HorizontalAlignment" Value="Stretch"/>
+                    <EventSetter Event="MouseDoubleClick" Handler="ListItem_DoubleClick"></EventSetter>
+                </Style>
+            </ListBox.ItemContainerStyle>
+            <ListBox.ItemTemplate>
+                <DataTemplate>
+                    <DockPanel LastChildFill="True">
+                        <Button Click="btnAppend_Click" Content="+" Width="30" Height="30" VerticalAlignment="Center" DockPanel.Dock="Right"/>
+                        <Button Click="btnRemove_Click" Content="X" Width="30" Height="30" VerticalAlignment="Center" DockPanel.Dock="Right"/>
+                        <controls:BeatVisualizer DockPanel.Dock="Left" Foreground="Magenta" Pattern="{Binding}" HorizontalAlignment="Stretch" Height="30" VerticalAlignment="Center"/>
+                    </DockPanel>
+                </DataTemplate>
+            </ListBox.ItemTemplate>
+        </ListBox>
+
+        <Button Content="+" HorizontalAlignment="Left" Margin="10,0,0,10" VerticalAlignment="Bottom" Width="21" Click="btnPlus_Click"/>
+        <Button Content="-" HorizontalAlignment="Left" Margin="36,0,0,10" Width="21" Height="20" VerticalAlignment="Bottom" Click="btnMinus_Click"/>
+        <Button Content="x2" HorizontalAlignment="Left" Margin="62,0,0,10" VerticalAlignment="Bottom" Width="21" Click="btnTimes2_Click"/>
+
+        <Button IsDefault="True" Click="btnOk_Click" Content="Ok" HorizontalAlignment="Right" Margin="0,0,90,10" VerticalAlignment="Bottom" Width="75"/>
+        <Button IsCancel="True" Content="Cancel" HorizontalAlignment="Right" Margin="0,0,10,10" VerticalAlignment="Bottom" Width="75"/>
+        <Button Content="/2" HorizontalAlignment="Left" Margin="88,0,0,10" VerticalAlignment="Bottom" Width="21" Click="btnBy2_Click"/>
+        <TextBlock Name="txtBeats" Text ="0 beats / measure"  Margin="114,0,170,12" VerticalAlignment="Bottom"/>
+    </Grid>
+</Window>

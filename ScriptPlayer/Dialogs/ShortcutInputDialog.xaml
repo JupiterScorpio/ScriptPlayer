@@ -1,0 +1,15 @@
+﻿<Window x:Class="ScriptPlayer.Dialogs.ShortcutInputDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ScriptPlayer.Dialogs"
+        mc:Ignorable="d" DataContext="{Binding RelativeSource={RelativeSource Self}}" WindowStartupLocation="CenterOwner"
+        Title="Set Shortcut" Height="190.571" Width="246.827" Focusable="True" PreviewKeyDown="ShortcutInputDialog_OnPreviewKeyDown" WindowStyle="ToolWindow" Closing="Window_Closing" MouseWheel="Window_MouseWheel" MouseDown="Window_MouseDown">
+    <Grid>
+        <StackPanel>
+            <TextBlock Margin="10" TextWrapping="Wrap" TextAlignment="Center" FontWeight="Bold" Text="Press key(s) to set new shortcut or close dialog to cancel."/>
+            <TextBlock Margin="10" TextWrapping="Wrap" TextAlignment="Center" Text="You can press a single key on your keyboard, a shortcut containing shift, alt and/or control and a key, or send a shortcut via automation software that uses WM_SENDKEY." Foreground="Gray"/>
+        </StackPanel>
+    </Grid>
+</Window>

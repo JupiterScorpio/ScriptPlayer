@@ -1,0 +1,853 @@
+﻿<Window x:Class="ScriptPlayer.Dialogs.SettingsDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:controls="clr-namespace:ScriptPlayer.Shared.Controls;assembly=ScriptPlayer.Shared"
+        xmlns:converters="clr-namespace:ScriptPlayer.Converters"
+        xmlns:shared="clr-namespace:ScriptPlayer.Shared;assembly=ScriptPlayer.Shared"
+        xmlns:viewModels="clr-namespace:ScriptPlayer.ViewModels"
+        xmlns:dialogs="clr-namespace:ScriptPlayer.Dialogs"
+        xmlns:controls1="clr-namespace:ScriptPlayer.Controls"
+        xmlns:theHandy="clr-namespace:ScriptPlayer.Shared.TheHandy;assembly=ScriptPlayer.Shared"
+        mc:Ignorable="d" DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        WindowStartupLocation="CenterOwner"
+        WindowStyle="ToolWindow" Loaded="SettingsDialog_OnLoaded"
+        Title="Settings" Height="492.373" Width="670.797" Closed="Window_Closed">
+    <Window.Resources>
+        <converters:DistinctValueToBooleanConverter x:Key="BooleanConverter"/>
+        <converters:TimeSpanToMillisecondsConverter x:Key="MillisecondsConverter"/>
+        <converters:TimeSpanToSecondsConverter x:Key="SecondsConverter"/>
+        <BooleanToVisibilityConverter x:Key="VisibilityConverter"/>
+        <Style TargetType="TextBlock" x:Key="SettingName">
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="DockPanel.Dock" Value="Left"/>
+            <Setter Property="Width" Value="120"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="TextAlignment" Value="Left"/>
+        </Style>
+
+        <Style TargetType="TextBlock" x:Key="SettingValue">
+            <Setter Property="Margin" Value="0"/>
+            <Setter Property="DockPanel.Dock" Value="Right"/>
+            <Setter Property="Width" Value="50"/>
+            <Setter Property="VerticalAlignment" Value="Center"/>
+            <Setter Property="TextAlignment" Value="Right"/>
+        </Style>
+
+        <HierarchicalDataTemplate DataType="{x:Type dialogs:SettingsPageViewModel}" ItemsSource="{Binding SubSettings}">
+            <StackPanel Orientation="Horizontal" Margin="0,1">
+                <StackPanel.Resources>
+                    <Style TargetType="controls:AwesomeIcon">
+                        <Setter Property="Width" Value="16"/>
+                        <Setter Property="Height" Value="16"/>
+                    </Style>
+                </StackPanel.Resources>
+                <ContentPresenter Content="{Binding Header}" VerticalAlignment="Center" Margin="0,0,8,0" Width="20"/>
+                <TextBlock FontSize="14" Text="{Binding Name}" VerticalAlignment="Center"/>
+            </StackPanel>
+        </HierarchicalDataTemplate>
+
+        <ContextMenu x:Key="InputContextMenu">
+            <MenuItem Header="Copy Command ID" Click="MnuCopyCommandId_OnClick"></MenuItem>
+        </ContextMenu>
+    </Window.Resources>
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" Background="#ffeeeeee">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="200"/>
+                <ColumnDefinition Width="10"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- <TreeView Grid.Column="0" Grid.Row="0" Margin="10,10,0,10" ItemsSource="{Binding Pages}" SelectedItemChanged="TreeView_OnSelectedItemChanged">
+                <TreeView.ItemContainerStyle>
+                    <Style TargetType="TreeViewItem">
+                        <Setter Property="IsExpanded" Value="True"/>
+                    </Style>
+                </TreeView.ItemContainerStyle>
+            </TreeView> -->
+
+            <ListBox Grid.Column="0" Grid.Row="0" Margin="10,42,0,10" ItemsSource="{Binding FilteredPages}" SelectedItem="{Binding SelectedPage}"/>
+
+            <GridSplitter HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Grid.Row="0" Grid.Column="1"/>
+
+            <controls:PageSelector DesignModeContentIdentifier="The Handy" x:Name="PageSelector" Grid.Column="2" Grid.Row="0" Margin="0,42,10,10" ActiveContentIdentifier="{Binding SelectedPage.SettingsId}">
+                <controls:PageSelector.Style>
+                    <Style TargetType="{x:Type controls:PageSelector}">
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="{x:Type controls:PageSelector}">
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto">
+                                        <ContentPresenter ContentSource="Content"/>
+                                    </ScrollViewer>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <DataTrigger Binding="{Binding RelativeSource={RelativeSource Self}, Path=Content.(controls:PageSelector.PreventScrolling)}" Value="True">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="{x:Type controls:PageSelector}">
+                                            <ScrollViewer VerticalScrollBarVisibility="Disabled">
+                                                <ContentPresenter ContentSource="Content"/>
+                                            </ScrollViewer>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                            </DataTrigger>
+                        </Style.Triggers>
+                    </Style>
+                </controls:PageSelector.Style>
+                <controls:PageSelector.Elements>
+                    <Grid controls:PageSelector.ContentIdentifier="Subtitles">
+                        <controls:PageSelector.Header>
+                            <controls:AwesomeIcon Icon="Closed_Captioning_Regular"/>
+                        </controls:PageSelector.Header>
+                        <StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="Subtitles" FontWeight="Bold" Margin="0,5,0,0"/>
+                                <TextBlock Text="This feature is experimental and even remotely complete." TextWrapping="Wrap" Margin="0,10,0,0"/>
+                                <CheckBox IsChecked="{Binding Settings.SubtitlesEnabled}" Margin="20,10,4,4">Enable Subtitles</CheckBox>
+                                <DockPanel>
+                                    <TextBlock Width="100" HorizontalAlignment="Left" Margin="20,4,4,4" TextWrapping="Wrap" Text="Format Preference" VerticalAlignment="Center"/>
+                                    <TextBox Text="{Binding Settings.SubtitleFormatPreference}" Height="23" Margin="0,4,4,4" VerticalAlignment="Center"/>
+                                </DockPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                    <Grid controls:PageSelector.ContentIdentifier="E-Stim Audio">
+                        <controls:PageSelector.Header>
+                            <controls:AwesomeIcon Icon="Lightning_Bolt_Solid"/>
+                        </controls:PageSelector.Header>
+                        <StackPanel>
+                            <DockPanel>
+                                <TextBlock Style="{StaticResource SettingName}" Text="Audio Device" Margin="0,0,8,0"/>
+                                <ComboBox DockPanel.Dock="Right" SelectedItem="{Binding SelectedAudioDevice}" DisplayMemberPath="Description" ItemsSource="{Binding AudioDevices}"></ComboBox>
+                            </DockPanel>
+
+                            <DockPanel Margin="4">
+                                <TextBlock Style="{StaticResource SettingName}" Text="Script Delay"/>
+                                <TextBlock Style="{StaticResource SettingValue}" Text="{Binding Path=Settings.AudioDelay, Converter={StaticResource MillisecondsConverter}, StringFormat={}{0:f0} ms}"/>
+                                <Slider Value="{Binding Path=Settings.AudioDelay, Converter={StaticResource MillisecondsConverter}}" Margin="0,4" Minimum="-2500" Maximum="2500" SmallChange="25" LargeChange="100"  IsSnapToTickEnabled="True" TickFrequency="25"/>
+                            </DockPanel>
+                        </StackPanel>
+                    </Grid>
+                    <Grid controls:PageSelector.ContentIdentifier="Funstim Converter">
+                        <controls:PageSelector.Header>
+                            <controls:AwesomeIcon Icon="Lightning_Bolt_Solid"/>
+                        </controls:PageSelector.Header>
+                        <StackPanel>
+                            <DockPanel>
+                                <TextBlock Style="{StaticResource SettingName}" Text="Frequencies (Hz)" Margin="0,0,8,0"/>
+                                <TextBox Text="{Binding Settings.FunstimFrequencies}" Height="23" Margin="0,4,4,4" VerticalAlignment="Center"/>
+                            </DockPanel>
+
+                            <DockPanel>
+                                <TextBlock Style="{StaticResource SettingName}" Text="Fade in/out"/>
+                                <TextBlock Style="{StaticResource SettingValue}" Text="{Binding Path=Settings.FunstimFadeMs, Converter={StaticResource MillisecondsConverter}, StringFormat={}{0:f0} ms}"/>
+                                <Slider Value="{Binding Path=Settings.FunstimFadeMs, Converter={StaticResource MillisecondsConverter}}" Margin="8,4" Minimum="0" Maximum="5000" SmallChange="100" LargeChange="500"  IsSnapToTickEnabled="True" TickFrequency="100"/>
+                            </DockPanel>
+
+                            <DockPanel>
+                                <TextBlock Style="{StaticResource SettingName}" Text="Ramp Intensity"/>
+                                <TextBlock Style="{StaticResource SettingValue}" Text="{Binding Path=Settings.FunstimRamp, StringFormat={}{0:f0} %}"/>
+                                <Slider Value="{Binding Path=Settings.FunstimRamp}" Margin="8,4" Minimum="0" Maximum="100" SmallChange="1" LargeChange="10" IsSnapToTickEnabled="False" TickFrequency="100"/>
+                            </DockPanel>
+
+                            <DockPanel>
+                                <CheckBox Margin="128,0" IsChecked="{Binding Settings.FunstimFadeOnPause}" Content="Fade out during pauses"/>
+                            </DockPanel>
+                        </StackPanel>
+                    </Grid>
+                    <Grid controls:PageSelector.ContentIdentifier="Crop Video">
+                        <controls:PageSelector.Header>
+                            <controls:AwesomeIcon Icon="Alternate_Crop_Solid"/>
+                        </controls:PageSelector.Header>
+                        <StackPanel>
+                            <TextBlock Margin="8" Text="Video Crop can be used to hide the beatbar in CH / FH videos, hide other distracting elements or only show one side of a side-by-side video." TextWrapping="Wrap"></TextBlock>
+                            <CheckBox Margin="8" IsChecked="{Binding Settings.CropVideo}" Content="Enable Video Crop"/>
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto"/>
+                                    <RowDefinition Height="*"/>
+                                </Grid.RowDefinitions>
+
+                                <DockPanel Grid.Column="1" Grid.Row="0">
+                                    <TextBlock Text="{Binding Path=Settings.CropLeft, StringFormat={}{0:P0}}" Width="35" DockPanel.Dock="Left" VerticalAlignment="Center" TextAlignment="Center"/>
+                                    <TextBlock Text="{Binding Path=Settings.CropRight, StringFormat={}{0:P0}}" Width="35"  DockPanel.Dock="Right" VerticalAlignment="Center" TextAlignment="Center"/>
+                                    <shared:RangeSlider Minimum="0.0" Maximum="1.0" Height="20" HorizontalAlignment="Stretch" LowerValue="{Binding Path=Settings.CropLeft, Mode=TwoWay}" UpperValue="{Binding Path=Settings.CropRight, Mode=TwoWay}"/>
+                                </DockPanel>
+                                <DockPanel LastChildFill="True" Grid.Row="1" Grid.Column="0" >
+                                    <TextBlock Text="{Binding Path=Settings.CropTop, StringFormat={}{0:P0}}" Width="35" DockPanel.Dock="Top" HorizontalAlignment="Center" TextAlignment="Center"/>
+                                    <TextBlock Text="{Binding Path=Settings.CropBottom, StringFormat={}{0:P0}}" Width="35"  DockPanel.Dock="Bottom" HorizontalAlignment="Center" TextAlignment="Center"/>
+                                    <shared:RangeSlider Minimum="0.0" Maximum="1.0" Height="20" HorizontalAlignment="Stretch" LowerValue="{Binding Path=Settings.CropTop, Mode=TwoWay}" UpperValue="{Binding Path=Settings.CropBottom, Mode=TwoWay}">
+                                        <shared:RangeSlider.LayoutTransform>
+                                            <RotateTransform Angle="90"></RotateTransform>
+                                        </shared:RangeSlider.LayoutTransform>
+                                    </shared:RangeSlider>
+                                </DockPanel>
+                                <controls1:CutoutPreview Grid.Row="1" Grid.Column="1" Cutout="{Binding Settings.CropRect}" VerticalAlignment="Stretch" MinHeight="240" HorizontalAlignment="Stretch"/>
+                            </Grid>
+                        </StackPanel>
+                    </Grid>
+                    <Grid controls:PageSelector.ContentIdentifier="Format Preference">
+                        <controls:PageSelector.Header>
+                            <controls:AwesomeIcon Icon="Star_Solid"/>
+                        </controls:PageSelector.Header>
+                        <StackPanel>
+                            <TextBlock Margin="4" TextWrapping="Wrap" Text="Here you can set the prefered order in which scripts and media files are selected if there are multiple files with the same name but different extensions. Separate multiple extensions with a colon or semi-colon. Extension that are not explicitly listed will be prioritized alphabetically"/>
+
+                            <TextBlock Margin="4,4,4,0" Text="Script Format Preference:"/>
+                            <TextBox Margin="4" Text="{Binding Settings.ScriptFormatPreference}"/>
+
+                            <TextBlock Margin="4,4,4,0" Text="Media Format Preference:"/>
+                            <TextBox Margin="4" Text="{Binding Settings.MediaFormatPreference}"/>
+
+                            <TextBlock Margin="4,4,4,0" Text="Subtitle Format Preference:"/>
+                            <TextBox Margin="4" Text="{Binding Settings.SubtitleFormatPreference}"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid controls:PageSelector.ContentIdentifier="Devices">
+                        <controls:PageSelector.Header>
+                            <controls:AwesomeIcon Icon="Heartbeat_Solid"/>
+                        </controls:PageSelector.Header>
+                        <StackPanel>
+                            <TextBlock Text="Vibration Conversion Mode:"/>
+                            <RadioButton Margin="4" IsChecked="{Binding Settings.VibratorConversionMode, Converter={StaticResource BooleanConverter}, 
+                                ConverterParameter={x:Static shared:VibratorConversionMode.PositionToSpeed}}" Content="Convert position to speed"/>
+                            <RadioButton Margin="4" IsChecked="{Binding Settings.VibratorConversionMode, Converter={StaticResource BooleanConverter}, 
+                                ConverterParameter={x:Static shared:VibratorConversionMode.PositionToSpeedInverted}}" Content="Convert position to speed (Inverted)"/>
+                            <RadioButton Margin="4" IsChecked="{Binding Settings.VibratorConversionMode, Converter={StaticResource BooleanConverter}, 
+                                ConverterParameter={x:Static shared:VibratorConversionMode.SpeedFullDuration}}" Content="Use speed"/>
+                            <RadioButton Margin="4" IsChecked="{Binding Settings.VibratorConversionMode, Converter={StaticResource BooleanConverter}, 
+                                ConverterParameter={x:Static shared:VibratorConversionMode.SpeedHalfDuration}}" Content="Use speed but stop after half the duration"/>
+                            <RadioButton Margin="4" IsChecked="{Binding Settings.VibratorConversionMode, Converter={StaticResource BooleanConverter}, 
+                                ConverterParameter={x:Static shared:VibratorConversionMode.SpeedTimesLengthFullDuration}}" Content="Use speed * length"/>
+                            <RadioButton Margin="4" IsChecked="{Binding Settings.VibratorConversionMode, Converter={StaticResource BooleanConverter}, 
+                                ConverterParameter={x:Static shared:VibratorConversionMode.SpeedTimesLengthHalfDuration}}" Content="Use speed * lengthbut stop after half the duration"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid controls:PageSelector.ContentIdentifier="FFmpeg">
+                        <controls:PageSelector.Header>
+                            <controls:AwesomeIcon Icon="Video_File_Regular"/>
+                        </controls:PageSelector.Header>
+                        <StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="FFmpeg" FontWeight="Bold" Margin="0,10,0,0"/>
+                                <DockPanel>
+                                    <TextBlock Width="60" HorizontalAlignment="Left" Margin="20,4,4,4" TextWrapping="Wrap" Text="Path" VerticalAlignment="Center"/>
+                                    <Button DockPanel.Dock="Right"  Content="..." HorizontalAlignment="Left" Margin="4" VerticalAlignment="Top" Width="21" Height="21" Click="BtnBrowseForFfmpeg_Click"/>
+                                    <TextBox Text="{Binding Settings.FfmpegPath}" Height="23" Margin="0,4,4,4" VerticalAlignment="Center"/>
+                                </DockPanel>
+                                <TextBlock HorizontalAlignment="Stretch" TextWrapping="Wrap">
+                                    <Run>FFmpeg can be used to generate Thumbnails and Preview GIFs from within ScriptPlayer. To use FFmpeg, download it from </Run>
+                                    <Hyperlink Click="BtnFfmpeg_Click" ToolTip="https://www.ffmpeg.org/download.html">the official homepage</Hyperlink>
+                                    <Run>, install it on your computer and set the path to the </Run>
+                                    <Bold>ffmpeg.exe</Bold>
+                                    <Run> contained in the build.</Run>
+                                </TextBlock>
+                                <TextBlock Text="Automatically generate:" Margin="0,10,0,0"/>
+                                <CheckBox Margin="4" IsChecked="{Binding Settings.AutogenerateThumbnails}" Content="Thumbnails for opened videos"/>
+                                <CheckBox Margin="4" IsChecked="{Binding Settings.AutogenerateAllForPlaylist}" Content="Thumbnails, Heatmap &amp; Preview for videos in playlist"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                    <Grid controls:PageSelector.ContentIdentifier="Chapter Settings">
+                        <controls:PageSelector.Header>
+                            <controls:AwesomeIcon Icon="Bookmark_Solid"/>
+                        </controls:PageSelector.Header>
+                        <StackPanel>
+                            <TextBlock Text="Chapter Mode:"/>
+                            <CheckBox Margin="4" IsChecked="{Binding Settings.RandomChapters}" Content="Enabled"/>
+                            <RadioButton Margin="4" IsChecked="{Binding Settings.ChapterMode, Converter={StaticResource BooleanConverter}, 
+                                ConverterParameter={x:Static viewModels:ChapterMode.FastestChapter}}" Content="Fastest Chapter"/>
+                            <RadioButton Margin="4" IsChecked="{Binding Settings.ChapterMode, Converter={StaticResource BooleanConverter}, 
+                                ConverterParameter={x:Static viewModels:ChapterMode.RandomChapter}}" Content="Random Chapter"/>
+                            <RadioButton Margin="4" IsChecked="{Binding Settings.ChapterMode, Converter={StaticResource BooleanConverter}, 
+                                ConverterParameter={x:Static viewModels:ChapterMode.FastestChapterLimitedDuration}}" Content="Fastest Chapter (limited)"/>
+                            <RadioButton Margin="4" IsChecked="{Binding Settings.ChapterMode, Converter={StaticResource BooleanConverter}, 
+                                ConverterParameter={x:Static viewModels:ChapterMode.RandomChapterLimitedDuration}}" Content="Random Chapter (limited)"/>
+                            <RadioButton Margin="4" IsChecked="{Binding Settings.ChapterMode, Converter={StaticResource BooleanConverter}, 
+                                ConverterParameter={x:Static viewModels:ChapterMode.FastestTimeSpan}}" Content="Fastest Section"/>
+                            <StackPanel Orientation="Horizontal">
+                            <RadioButton Margin="4" IsChecked="{Binding Settings.ChapterMode, Converter={StaticResource BooleanConverter}, 
+                                ConverterParameter={x:Static viewModels:ChapterMode.RandomTimeSpan}}" Content="Random Section"/>
+                                <CheckBox
+                                    IsEnabled="{Binding Settings.ChapterMode, Converter={StaticResource BooleanConverter}, 
+                                ConverterParameter={x:Static viewModels:ChapterMode.RandomTimeSpan}}"
+                                    Margin="8,0,0,0"  VerticalAlignment="Center" IsChecked="{Binding Settings.IncludeFilledGapsInRandomSelection}" Content="Include filled gaps"></CheckBox>
+                                </StackPanel>
+
+                            <DockPanel Margin="4" ToolTip="The approximate duration of randomly selected sections.">
+                                <TextBlock Style="{StaticResource SettingName}" Text="Target Duration"/>
+                                <TextBlock Style="{StaticResource SettingValue}" Text="{Binding Path=Settings.ChapterTargetDuration, Converter={StaticResource SecondsConverter}, StringFormat={}{0:f0}s}"/>
+                                <Slider Margin="0,4" Minimum="10" Maximum="600" Value="{Binding Path=Settings.ChapterTargetDuration, Converter={StaticResource SecondsConverter}}"  IsSnapToTickEnabled="True" TickFrequency="10"/>
+                            </DockPanel>
+                        </StackPanel>
+                    </Grid>
+                    <Grid controls:PageSelector.ContentIdentifier="Input Mappings"
+                          controls:PageSelector.PreventScrolling="True">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="*"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        <controls:PageSelector.Header>
+                            <controls:AwesomeIcon Icon="Keyboard_Regular"/>
+                        </controls:PageSelector.Header>
+                        <DataGrid ItemsSource="{Binding InputMappings}" AutoGenerateColumns="False" CanUserAddRows="False" CanUserDeleteRows="False" IsReadOnly="False" Margin="0,0,0,10">
+                            <DataGrid.RowStyle>
+                                <Style TargetType="DataGridRow">
+                                    <EventSetter Event="MouseDoubleClick" Handler="CommandMappingRow_DoubleClick"/>
+                                    <Setter Property="ContextMenu" Value="{StaticResource InputContextMenu}"/>
+                                </Style>
+                            </DataGrid.RowStyle>
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Command" Width="*" Binding="{Binding DisplayText}" IsReadOnly="True">
+                                    <DataGridTextColumn.CellStyle>
+                                        <Style TargetType="DataGridCell">
+                                            <Setter Property="ToolTip" Value="{Binding CommandId}" />
+                                        </Style>
+                                    </DataGridTextColumn.CellStyle>
+                                </DataGridTextColumn>
+                                <DataGridTemplateColumn Header="Global">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <CheckBox IsChecked="{Binding Path=IsGlobal, UpdateSourceTrigger=PropertyChanged}" />
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                                <DataGridTemplateColumn Header="Shortcut" Width="*" IsReadOnly="True">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate DataType="{x:Type dialogs:InputMappingViewModel}">
+                                            <DockPanel LastChildFill="True">
+                                                <Button ToolTip="Remove this shortcut"
+                                                    Click="BtnRemoveShortCut_Click" DockPanel.Dock="Right" Focusable="False" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                                                    <controls:AwesomeIcon Width="12" Height="12" Icon="Times_Solid"/>
+                                                </Button>
+                                                <Button ToolTip="Edit this shortcut"
+                                                        Click="BtnEditShortCut_Click" DockPanel.Dock="Right" Focusable="False" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                                                    <controls:AwesomeIcon Width="12" Height="12" Icon="Alternate_Pencil_Solid"/>
+                                                </Button>
+                                                <Button ToolTip="Add another shortcut for this command"
+                                                    Click="BtnAddShortCut_Click" DockPanel.Dock="Right" Focusable="False" Style="{StaticResource {x:Static ToolBar.ButtonStyleKey}}">
+                                                    <controls:AwesomeIcon Width="12" Height="12" Icon="Plus_Solid"/>
+                                                </Button>
+                                                <TextBlock Text="{Binding Shortcut}" DockPanel.Dock="Left"/>
+                                            </DockPanel>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </DataGrid.Columns>
+                        </DataGrid>
+                        <Button Grid.Row="1" Click="BtnResetInputMappings_Click" Content="Restore default shortcuts" HorizontalAlignment="Right" Width="192" Height="20" VerticalAlignment="Bottom"/>
+                    </Grid>
+                    <Grid controls:PageSelector.ContentIdentifier="Scripts">
+                        <controls:PageSelector.Header>
+                            <controls:AwesomeIcon Icon="File_Regular"/>
+                        </controls:PageSelector.Header>
+                        <StackPanel>
+                            <TextBlock Text="Behavior when scripts can't be loaded:"/>
+                            <RadioButton Margin="4" IsChecked="{Binding Settings.NoScriptBehavior, Converter={StaticResource BooleanConverter}, 
+                                ConverterParameter={x:Static viewModels:NoScriptBehaviors.ClearScript}}" Content="Clear Script"/>
+                            <RadioButton Margin="4" IsChecked="{Binding Settings.NoScriptBehavior, Converter={StaticResource BooleanConverter}, 
+                                ConverterParameter={x:Static viewModels:NoScriptBehaviors.KeepLastScript}}" Content="Keep Previously Loaded"/>
+                            <RadioButton Margin="4" IsChecked="{Binding Settings.NoScriptBehavior, Converter={StaticResource BooleanConverter}, 
+                                ConverterParameter={x:Static viewModels:NoScriptBehaviors.FallbackScript}}" Content="Use Fallback Script:"/>
+                            <DockPanel Margin="12,4,4,4">
+                                <Button Content="..." DockPanel.Dock="Right" Width="20"  Margin="4,0,0,0" Click="BtnSelectFallBackScript_Click"/>
+                                <TextBox Text="{Binding Settings.FallbackScriptFile}" DockPanel.Dock="Left"/>
+                            </DockPanel>
+                            <TextBlock TextWrapping="Wrap" Text="Select a script file to always use the same fallback script, specify a directory to select a random script or specify a directory and add a * to select a random script from that directory or any sub-directory in it." Margin="12,4,4,4"/>
+                            <CheckBox IsChecked="{Binding Settings.RemoveGapsFromFallbackScript}" Margin="12,4,4,4" Content="Remove Gaps" ToolTip="Will remove any gaps > 10s from the script"/>
+                            <CheckBox IsChecked="{Binding Settings.LoopFallbackScript}" Margin="12,4,4,4" Content="Loop for full duration" ToolTip="Will loop short scripts for the entire duration of the video"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid controls:PageSelector.ContentIdentifier="Notifications">
+                        <controls:PageSelector.Header>
+                            <controls:AwesomeIcon Icon="Alternate_Arrows_Horizontal_Solid"/>
+                        </controls:PageSelector.Header>
+                        <StackPanel>
+                            <CheckBox Margin="4,4,4,12" IsChecked="{Binding Settings.UseExternalOsd}" Content="Use external OSD if available" ToolTip="Some external video players (e.g. Zoom Player) can be used to display ScriptPlayer's notifications on their internal OSD (On Screen Displays)"/>
+                            <CheckBox Margin="4" IsChecked="{Binding Settings.NotifyPlayPause}" Content="Play / Pause"/>
+                            <CheckBox Margin="4" IsChecked="{Binding Settings.NotifyPosition}" Content="Position"/>
+                            <CheckBox Margin="4" IsChecked="{Binding Settings.NotifyVolume}" Content="Volume"/>
+                            <CheckBox Margin="4" IsChecked="{Binding Settings.NotifyFileLoaded}" Content="File loading"/>
+                            <CheckBox Margin="12,4,4,4" IsChecked="{Binding Settings.NotifyFileLoadedOnlyFailed}" Content="only when loading fails"/>
+                            <CheckBox Margin="4" IsChecked="{Binding Settings.NotifyDevices}" Content="Devices"/>
+                            <CheckBox Margin="4" IsChecked="{Binding Settings.NotifyGaps}" Content="Gaps / Events"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid controls:PageSelector.ContentIdentifier="Displayed Time">
+                        <controls:PageSelector.Header>
+                            <controls:AwesomeIcon Icon="Clock_Regular"/>
+                        </controls:PageSelector.Header>
+                        <StackPanel>
+                            <CheckBox Margin="4" IsChecked="{Binding Settings.ShowTimeLeft}" Content="Show time left instead of elapsed"/>
+                            <CheckBox Margin="4" IsChecked="{Binding Settings.LimitDisplayedTimeToSelection}" Content="Limit to active selection"/>
+                            <TextBlock Margin="4" Text="Mode:"/>
+                            <StackPanel Margin="12,0,0,0">
+                                <RadioButton Margin="2" HorizontalAlignment="Stretch" IsChecked="{Binding Path=Settings.TimeDisplayMode, Converter={StaticResource BooleanConverter}, ConverterParameter={x:Static viewModels:TimeDisplayMode.Original}}" Content="Media Progress" />
+                                <RadioButton Margin="2" HorizontalAlignment="Stretch" IsChecked="{Binding Path=Settings.TimeDisplayMode, Converter={StaticResource BooleanConverter}, ConverterParameter={x:Static viewModels:TimeDisplayMode.ContentAndGaps}}" Content="Content and gaps" />
+                                <RadioButton Margin="2" HorizontalAlignment="Stretch" IsChecked="{Binding Path=Settings.TimeDisplayMode, Converter={StaticResource BooleanConverter}, ConverterParameter={x:Static viewModels:TimeDisplayMode.ContentOnly}}" Content="Content only" />
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                    <Grid controls:PageSelector.ContentIdentifier="Debug">
+                        <controls:PageSelector.Header>
+                            <controls:AwesomeIcon Icon="Bug_Solid"/>
+                        </controls:PageSelector.Header>
+                        <StackPanel>
+                            <CheckBox Margin="4" IsChecked="{Binding Settings.AutoReloadScript}" Content="Auto Reload Script"/>
+                            <CheckBox Margin="4" IsChecked="{Binding Settings.ShowHeatMap}" Content="Show Heat Map"/>
+                            <CheckBox Margin="4" IsChecked="{Binding Settings.ShowScriptPositions}" Content="Show Script Positions"/>
+                            <CheckBox Margin="4" IsChecked="{Binding Settings.LogMarkers}" Content="Log Markers"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid controls:PageSelector.ContentIdentifier="General">
+                        <controls:PageSelector.Header>
+                            <controls:AwesomeIcon Icon="Cog_Solid"/>
+                        </controls:PageSelector.Header>
+                        <StackPanel>
+                            <CheckBox Margin="4" IsChecked="{Binding Settings.CheckForNewVersionOnStartup}" Content="Check for new version on startup"/>
+                            <CheckBox Margin="4" IsChecked="{Binding Settings.StayOnTop}" Content="Stay on top"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid controls:PageSelector.ContentIdentifier="Players">
+                        <controls:PageSelector.Header>
+                            <controls:AwesomeIcon Icon="Alternate_External_Link_Square_Solid"/>
+                        </controls:PageSelector.Header>
+                        <StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="Fuzzy Name Matching" FontWeight="Bold" Margin="0,5,0,0"/>
+                                <TextBlock Text="Some players change the name of the opened video file (e.g. add the year this video was made) which can make finding a matching script impossible. Fuzzy name matching can be used to transform the name of the video back but requires a certain level of knowledge of regular expressions to use." TextWrapping="Wrap" Margin="0,10,0,0"/>
+                                <CheckBox IsChecked="{Binding Settings.FuzzyMatchingEnabled}" Margin="20,10,4,4">Enable Fuzzy Name Matching</CheckBox>
+                                <DockPanel>
+                                    <TextBlock Width="80" HorizontalAlignment="Left" Margin="20,4,4,4" TextWrapping="Wrap" Text="Pattern" VerticalAlignment="Center"/>
+                                    <TextBox Text="{Binding Settings.FuzzyMatchingPattern}" Height="23" Margin="0,4,4,4" VerticalAlignment="Center"/>
+                                </DockPanel>
+                                <DockPanel>
+                                    <TextBlock Width="80" HorizontalAlignment="Left" Margin="20,4,4,4" TextWrapping="Wrap" Text="Replacement" VerticalAlignment="Center"/>
+                                    <TextBox Text="{Binding Settings.FuzzyMatchingReplacement}" Height="23" Margin="0,4,4,4" VerticalAlignment="Center"/>
+                                </DockPanel>
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="Filename URL-Decoding" FontWeight="Bold" Margin="0,5,0,0"/>
+                                <TextBlock Text="If your videos are streamed over a webservice, video file names might need to be decoded so that ScriptPlayer can find related files correctly." TextWrapping="Wrap" Margin="0,10,0,0"/>
+                                <CheckBox IsChecked="{Binding Settings.UrlDecodeFilenames}" Margin="20,10,4,4">Enable Url Decoding</CheckBox>
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="HereSphere" FontWeight="Bold" Margin="0,10,0,0"/>
+                                <DockPanel>
+                                    <TextBlock Width="80" HorizontalAlignment="Left" Margin="20,4,4,4" TextWrapping="Wrap" Text="IP : Port" VerticalAlignment="Center"/>
+                                    <Button DockPanel.Dock="Right"  Content="Use Default" HorizontalAlignment="Left" Margin="4" VerticalAlignment="Top" Width="75" Height="21" Click="BtnHereSphereDefault_Click"/>
+                                    <TextBox Text="{Binding Settings.DeoVrEndpoint}" Height="23" Margin="0,4,4,4" VerticalAlignment="Center"/>
+                                </DockPanel>
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="MPC-HC" FontWeight="Bold" Margin="0,10,0,0"/>
+                                <DockPanel>
+                                    <TextBlock Width="80" HorizontalAlignment="Left" Margin="20,4,4,4" TextWrapping="Wrap" Text="IP : Port" VerticalAlignment="Center"/>
+                                    <Button DockPanel.Dock="Right"  Content="Use Default" HorizontalAlignment="Left" Margin="4" VerticalAlignment="Top" Width="75" Height="21" Click="BtnMpcHcDefault_Click"/>
+                                    <TextBox Text="{Binding Settings.MpcHcEndpoint}" Height="23" Margin="0,4,4,4" VerticalAlignment="Center"/>
+                                </DockPanel>
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="Samsung VR" FontWeight="Bold" Margin="0,10,0,0"/>
+                                <DockPanel>
+                                    <TextBlock Width="80" HorizontalAlignment="Left" Margin="20,4,4,4" TextWrapping="Wrap" Text="UDP Port" VerticalAlignment="Center"/>
+                                    <Button DockPanel.Dock="Right"  Content="Use Default" HorizontalAlignment="Left" Margin="4" VerticalAlignment="Top" Width="75" Height="21" Click="BtnSamsungDefault_Click"/>
+                                    <TextBox Text="{Binding Settings.SamsungVrUdpPort}" Height="23" Margin="0,4,4,4" VerticalAlignment="Center"/>
+                                </DockPanel>
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="GoPro VR Player" FontWeight="Bold" Margin="0,10,0,0"/>
+                                <DockPanel>
+                                    <TextBlock Width="80" HorizontalAlignment="Left" Margin="20,4,4,4" TextWrapping="Wrap" Text="UDP Port" VerticalAlignment="Center"/>
+                                    <Button DockPanel.Dock="Right"  Content="Use Default" HorizontalAlignment="Left" Margin="4" VerticalAlignment="Top" Width="75" Height="21" Click="BtnGoProVrDefault_Click"/>
+                                    <TextBox Text="{Binding Settings.GoProVrPlayerUdpPort}" Height="23" Margin="0,4,4,4" VerticalAlignment="Center"/>
+                                </DockPanel>
+                            </StackPanel>                            
+                            <StackPanel>
+                                <TextBlock Text="VLC" FontWeight="Bold" Margin="0,10,0,0"/>
+                                <StackPanel>
+                                    <DockPanel>
+                                        <TextBlock Width="80" HorizontalAlignment="Left" Margin="20,4,4,4" TextWrapping="Wrap" Text="IP : Port" VerticalAlignment="Center"/>
+                                        <Button DockPanel.Dock="Right" Margin="4" Width="75" Height="23" HorizontalAlignment="Left" Content="Use Default" Click="BtnVlcDefault_Click"/>
+                                        <TextBox Text="{Binding Settings.VlcEndpoint}" Height="23" Margin="0,4,4,4" VerticalAlignment="Center"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Width="80" HorizontalAlignment="Left" Margin="20,4,4,4" TextWrapping="Wrap" Text="Password" VerticalAlignment="Center"/>
+                                        <PasswordBox x:Name="txtPasswordVlcPassword" PasswordChanged="TxtPasswordVlcPassword_OnPasswordChanged" Height="23" Margin="0,4,4,4" VerticalAlignment="Center"/>
+                                    </DockPanel>
+                                </StackPanel>
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="Whirligig" FontWeight="Bold" Margin="0,10,0,0"/>
+                                <DockPanel>
+                                    <TextBlock Width="80" HorizontalAlignment="Left" Margin="20,4,4,4" TextWrapping="Wrap" Text="IP : Port" VerticalAlignment="Center"/>
+                                    <Button DockPanel.Dock="Right" Content="Use Default" HorizontalAlignment="Left" Margin="4" VerticalAlignment="Top" Width="75" Height="23" Click="BtnWhirligigDefault_Click"/>
+                                    <TextBox Text="{Binding Settings.WhirligigEndpoint}" Height="23" Margin="0,4,4,4" VerticalAlignment="Center"/>
+                                </DockPanel>
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="Zoom Player" FontWeight="Bold" Margin="0,10,0,0"/>
+                                <DockPanel>
+                                    <TextBlock Width="80" HorizontalAlignment="Left" Margin="20,4,4,4" TextWrapping="Wrap" Text="IP : Port" VerticalAlignment="Center"/>
+                                    <Button DockPanel.Dock="Right" Content="Use Default" HorizontalAlignment="Left" Margin="4" VerticalAlignment="Top" Width="75" Height="23" Click="BtnZoomDefault_Click"/>
+                                    <TextBox Text="{Binding Settings.ZoomPlayerEndpoint}" Height="23" Margin="0,4,4,4" VerticalAlignment="Center"/>
+                                </DockPanel>
+                            </StackPanel>
+                            <StackPanel>
+                                <TextBlock Text="Kodi" FontWeight="Bold" Margin="0,10,0,0"/>
+                                <StackPanel>
+                                    <DockPanel>
+                                        <TextBlock Width="80" HorizontalAlignment="Left" Margin="20,4,4,4" TextWrapping="Wrap" Text="IP" VerticalAlignment="Center"/>
+                                        <Button DockPanel.Dock="Right" Tag="IpDefault" Content="Use Default" HorizontalAlignment="Left" Margin="4" VerticalAlignment="Top" Width="75" Height="23" Click="BtnKodiDefault_Click"/>
+                                        <TextBox Text="{Binding Settings.KodiIp}" Height="23" Margin="0,4,4,4" VerticalAlignment="Center"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Width="80" HorizontalAlignment="Left" Margin="20,4,4,4" TextWrapping="Wrap" Text="HTTP Port" VerticalAlignment="Center"/>
+                                        <Button DockPanel.Dock="Right" Tag="HttpPortDefault" Content="Use Default" HorizontalAlignment="Left" Margin="4" VerticalAlignment="Top" Width="75" Height="23" Click="BtnKodiDefault_Click"/>
+                                        <TextBox Text="{Binding Settings.KodiHttpPort}" Height="23" Margin="0,4,4,4" VerticalAlignment="Center"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Width="80" HorizontalAlignment="Left" Margin="20,4,4,4" TextWrapping="Wrap" Text="TCP Port" VerticalAlignment="Center"/>
+                                        <Button DockPanel.Dock="Right" Tag="TcpPortDefault" Content="Use Default" HorizontalAlignment="Left" Margin="4" VerticalAlignment="Top" Width="75" Height="23" Click="BtnKodiDefault_Click"/>
+                                        <TextBox Text="{Binding Settings.KodiTcpPort}" Height="23" Margin="0,4,4,4" VerticalAlignment="Center"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Width="80" HorizontalAlignment="Left" Margin="20,4,4,4" TextWrapping="Wrap" Text="User" VerticalAlignment="Center"/>
+                                        <Button DockPanel.Dock="Right" Tag="UserDefault" Content="Use Default" HorizontalAlignment="Left" Margin="4" VerticalAlignment="Top" Width="75" Height="23" Click="BtnKodiDefault_Click"/>
+                                        <TextBox Text="{Binding Settings.KodiUser}" Height="23" Margin="0,4,4,4" VerticalAlignment="Center"/>
+                                    </DockPanel>
+                                    <DockPanel>
+                                        <TextBlock Width="80" HorizontalAlignment="Left" Margin="20,4,4,4" TextWrapping="Wrap" Text="Password" VerticalAlignment="Center"/>
+                                        <Button DockPanel.Dock="Right" Tag="PasswordDefault" Content="Use Default" HorizontalAlignment="Left" Margin="4" VerticalAlignment="Top" Width="75" Height="23" Click="BtnKodiDefault_Click"/>
+                                        <PasswordBox x:Name="txtPasswordKodiPassword" PasswordChanged="TxtPasswordKodiPassword_OnPasswordChanged" Height="23" Margin="0,4,4,4" VerticalAlignment="Center"/>
+                                    </DockPanel>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Grid>
+                    <Grid controls:PageSelector.ContentIdentifier="The Handy">
+                        <controls:PageSelector.Header>
+                            <controls:AwesomeIcon Icon="Rock_Hand_Solid"/>
+                        </controls:PageSelector.Header>
+                        <StackPanel>
+                            <TextBlock Text="Common Settings"/>
+                            <DockPanel Margin="4" ToolTip="Connection key used to connect to The Handy. Sometimes also referred to as device id oder device key">
+                                <TextBlock Style="{StaticResource SettingName}" Text="Connection Key"/>
+                                <TextBox Text="{Binding Settings.HandyDeviceId}"/>
+                            </DockPanel>
+                            <TextBlock Text="Script Host"/>
+                            <RadioButton Margin="4" IsChecked="{Binding Settings.HandyScriptHost, Converter={StaticResource BooleanConverter}, 
+                                ConverterParameter={x:Static theHandy:HandyHost.HandyfeelingCom}}" Content="handyfeeling.com"/>
+                            <RadioButton Margin="4" IsChecked="{Binding Settings.HandyScriptHost, Converter={StaticResource BooleanConverter}, 
+                                ConverterParameter={x:Static theHandy:HandyHost.Local}}" Content="Local"/>
+
+                            <TextBlock Text="Local settings:"/>
+                            <DockPanel Margin="4" ToolTip="IP of this computer on the network shared with The Handy.">
+                                <TextBlock Style="{StaticResource SettingName}" Text="Local IP"/>
+                                <ComboBox ItemsSource="{Binding LocalAdresses}" IsEditable="True" Text="{Binding Settings.HandyLocalIp}"/>
+                            </DockPanel>
+                            <DockPanel Margin="4" ToolTip="Script server port of this computer on the network shared with The Handy.">
+                                <TextBlock Style="{StaticResource SettingName}" Text="Local Port"/>
+                                <TextBox Text="{Binding Settings.HandyLocalPort}"/>
+                            </DockPanel>
+                            <CheckBox IsChecked="{Binding Settings.WaitForDevicesToLoad}" Margin="4">Pause video while downloading script</CheckBox>
+                        </StackPanel>
+                    </Grid>
+                    <Grid controls:PageSelector.ContentIdentifier="Buttplug">
+                        <controls:PageSelector.Header>
+                            <controls:AwesomeIcon Icon="Plug_Solid"/>
+                        </controls:PageSelector.Header>
+                        <StackPanel>
+                            <DockPanel>
+                                <TextBlock HorizontalAlignment="Left" Margin="4" TextWrapping="Wrap" Text="Web Socket URL" VerticalAlignment="Center" Width="100"/>
+                                <Button Content="Use Default" HorizontalAlignment="Left" Margin="4" VerticalAlignment="Top" Width="75" Height="21" Click="BtnButtplugDefault_Click" DockPanel.Dock="Right"/>
+                                <TextBox Text="{Binding Settings.ButtplugUrl}" Height="23" Margin="0,4,4,4" VerticalAlignment="Top" />
+                            </DockPanel>
+                            <DockPanel>
+                                <TextBlock HorizontalAlignment="Left" Margin="4" TextWrapping="Wrap" Text="Path to exe" VerticalAlignment="Center" Width="100"/>
+                                <Button Content="Choose" HorizontalAlignment="Left" Margin="4" VerticalAlignment="Top" Width="75" Height="21" Click="BtnButtplugExePath_Click" DockPanel.Dock="Right"/>
+                                <TextBox Text="{Binding Settings.ButtplugExePath}" Height="23" Margin="0,4,4,4" VerticalAlignment="Top" />
+                            </DockPanel>
+                            <TextBlock Text="After ScriptPlayer has started:" Margin="4"/>
+                            <CheckBox IsChecked="{Binding Settings.AutoStartButtplug}" Content="Start Buttplug (if it's not already running)" Margin="4"/>
+                            <CheckBox IsChecked="{Binding Settings.AutoConnectToButtplug}" Content="Connect to Buttplug" Margin="4"/>
+                            <StackPanel Orientation="Horizontal">
+                                <TextBox Text="{Binding Settings.ButtplugConnectionAttempts}" Width="30" Margin="20,0,4,0"/>
+                                <TextBlock Text="attempts with a"/>
+                                <TextBox Text="{Binding Settings.ButtplugConnectionDelay}" Width="30" Margin="4,0,4,0"/>
+                                <TextBlock Text="second delay"/>
+                            </StackPanel>
+                            <TextBlock Text="After connecting to Buttplug:" Margin="4"/>
+                            <CheckBox IsChecked="{Binding Settings.AutoSearchForButtplugDevices}" Content="Search for Devices" Margin="4"/>
+                            <CheckBox IsChecked="{Binding Settings.AutoShowDeviceManager}" Content="Show Device Manager" Margin="4"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid controls:PageSelector.ContentIdentifier="Input">
+                        <controls:PageSelector.Header>
+                            <controls:AwesomeIcon Icon="Keyboard_Regular"/>
+                        </controls:PageSelector.Header>
+                        <StackPanel>
+                            <CheckBox Margin="4" IsChecked="{Binding Settings.ClickToPlayPause}" Content="Toggle playback when clicking video"/>
+                            <CheckBox Margin="4" IsChecked="{Binding Settings.DoubleClickToFullscreen}" Content="Toggle fullscreen when double-clicking video"/>
+                            <CheckBox Margin="4" IsChecked="{Binding Settings.FilterDoubleClicks}" Content="Filter double-clicks"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid controls:PageSelector.ContentIdentifier="Range">
+                        <controls:PageSelector.Header>
+                            <controls:AwesomeIcon Icon="Horizontal_Sliders_Solid"/>
+                        </controls:PageSelector.Header>
+                        <StackPanel>
+                            <DockPanel Margin="4" ToolTip="Minimum and maximum position of the Launch. Values received from the script will be scaled accordingly.">
+                                <TextBlock Style="{StaticResource SettingName}" Text="Range"/>
+                                <TextBlock Style="{StaticResource SettingValue}">
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} - {1}">
+                                            <Binding Path="Settings.MinPosition"/>
+                                            <Binding Path="Settings.MaxPosition"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+
+                                <shared:RangeSlider Margin="0,4" Minimum="0" Maximum="99" LowerValue="{Binding Settings.MinPosition, Mode=TwoWay}" UpperValue="{Binding Settings.MaxPosition, Mode=TwoWay}"/>
+                            </DockPanel>
+
+                            <DockPanel Margin="4" ToolTip="Inverts the input position before calculating the output position.">
+                                <TextBlock Style="{StaticResource SettingName}" Text="Invert Positions"/>
+                                <CheckBox IsChecked="{Binding Settings.InvertPosition}"/>
+                            </DockPanel>
+
+                            <DockPanel Margin="4" ToolTip="Automatically resets the device position to 0 when playback is paused.">
+                                <TextBlock Style="{StaticResource SettingName}" Text="Enable Auto Homing"/>
+                                <CheckBox IsChecked="{Binding Settings.AutoHomingEnabled}"/>
+                            </DockPanel>
+
+                            <DockPanel>
+                                <TextBlock Style="{StaticResource SettingName}" Text="Range Filter"/>
+                                <Grid>
+                                    <Grid.Resources>
+                                        <Style TargetType="{x:Type RadioButton}" BasedOn="{StaticResource {x:Static ToolBar.RadioButtonStyleKey}}">
+                                            <Setter Property="HorizontalAlignment" Value="Stretch"></Setter>
+                                        </Style>
+                                    </Grid.Resources>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                        <RowDefinition Height="*"/>
+                                    </Grid.RowDefinitions>
+                                    <RadioButton Grid.Row="0" HorizontalAlignment="Stretch" IsChecked="{Binding Path=Settings.FilterMode, Converter={StaticResource BooleanConverter}, ConverterParameter={x:Static viewModels:PositionFilterMode.FullRange}}" Content="Full Range" />
+                                    <RadioButton Grid.Row="1" HorizontalAlignment="Stretch" IsChecked="{Binding Path=Settings.FilterMode, Converter={StaticResource BooleanConverter}, ConverterParameter={x:Static viewModels:PositionFilterMode.Top}}" Content="Top" />
+                                    <RadioButton Grid.Row="2" HorizontalAlignment="Stretch" IsChecked="{Binding Path=Settings.FilterMode, Converter={StaticResource BooleanConverter}, ConverterParameter={x:Static viewModels:PositionFilterMode.Middle}}" Content="Middle" />
+                                    <RadioButton Grid.Row="3" HorizontalAlignment="Stretch" IsChecked="{Binding Path=Settings.FilterMode, Converter={StaticResource BooleanConverter}, ConverterParameter={x:Static viewModels:PositionFilterMode.Bottom}}" Content="Bottom" />
+                                    <RadioButton Grid.Row="4" HorizontalAlignment="Stretch" IsChecked="{Binding Path=Settings.FilterMode, Converter={StaticResource BooleanConverter}, ConverterParameter={x:Static viewModels:PositionFilterMode.SineWave}}" Content="Sine Wave" />
+                                    <RadioButton Grid.Row="5" HorizontalAlignment="Stretch" IsChecked="{Binding Path=Settings.FilterMode, Converter={StaticResource BooleanConverter}, ConverterParameter={x:Static viewModels:PositionFilterMode.TopBottom}}" Content="Top / Bottom" />
+                                </Grid>
+                            </DockPanel>
+                            <DockPanel>
+                                <TextBlock Style="{StaticResource SettingName}" Text="Filter Range"/>
+                                <TextBlock Style="{StaticResource SettingValue}" Text="{Binding Settings.FilterRange, StringFormat={}{0:p0}}" />
+                                <Slider Margin="0,4" Minimum="0.1" Maximum="0.9" Value="{Binding Settings.FilterRange}"/>
+                            </DockPanel>
+
+                        </StackPanel>
+                    </Grid>
+                    <Grid controls:PageSelector.ContentIdentifier="Speed">
+                        <controls:PageSelector.Header>
+                            <controls:AwesomeIcon Icon="Alternate_Exchange_Solid"/>
+                        </controls:PageSelector.Header>
+                        <StackPanel>
+                            <DockPanel Margin="4" ToolTip="Minimum and maximum speed of the Launch.">
+                                <TextBlock Style="{StaticResource SettingName}" Text="Speed"/>
+                                <TextBlock Style="{StaticResource SettingValue}">
+                                    <TextBlock.Text>
+                                        <MultiBinding StringFormat="{}{0} - {1}">
+                                            <Binding Path="Settings.MinSpeed"/>
+                                            <Binding Path="Settings.MaxSpeed"/>
+                                        </MultiBinding>
+                                    </TextBlock.Text>
+                                </TextBlock>
+                                <shared:RangeSlider Margin="0,4" Minimum="0" Maximum="99" LowerValue="{Binding Settings.MinSpeed, Mode=TwoWay}" UpperValue="{Binding Settings.MaxSpeed, Mode=TwoWay}"/>
+                            </DockPanel>
+
+                            <DockPanel Margin="4" ToolTip="Static multiplier that is applied after the automatic speed detection.">
+                                <TextBlock Style="{StaticResource SettingName}" Text="Speed Multiplier"/>
+                                <TextBlock Style="{StaticResource SettingValue}" Text="{Binding Settings.SpeedMultiplier, StringFormat={}x{0:f1}}"/>
+                                <Slider Margin="0,4" Minimum="0.1" Maximum="5.0" Value="{Binding Settings.SpeedMultiplier}"  IsSnapToTickEnabled="True" TickFrequency="0.1"/>
+                            </DockPanel>
+                        </StackPanel>
+                    </Grid>
+                    <Grid controls:PageSelector.ContentIdentifier="SoftSeek">
+                        <controls:PageSelector.Header>
+                            <controls:AwesomeIcon Icon="Forward_Solid"/>
+                        </controls:PageSelector.Header>
+                        <StackPanel>
+                            <TextBlock>"Soft Seek" blends two videos slowly into each other to smooth transistions</TextBlock>
+                            <CheckBox Margin="4" IsChecked="{Binding Settings.SoftSeekFiles}" Content="Soft Seek between videos"/>
+                            <DockPanel Margin="12,4,4,4" IsEnabled="{Binding Settings.SoftSeekFiles}">
+                                <TextBlock VerticalAlignment="Center" Text="Duration [ms] " Width="100" DockPanel.Dock="Left"/>
+                                <TextBlock Width="40" TextAlignment="Right" DockPanel.Dock="Right" Text="{Binding Settings.SoftSeekFilesDuration, Converter={StaticResource MillisecondsConverter}}"/>
+                                <Slider Value="{Binding Settings.SoftSeekFilesDuration, Converter={StaticResource MillisecondsConverter}}" VerticalAlignment="Center" DockPanel.Dock="Left"
+                                        Minimum="200" Maximum="10000" TickFrequency="100" IsSnapToTickEnabled="True"/>
+                            </DockPanel>
+                            <CheckBox Margin="4" IsChecked="{Binding Settings.SoftSeekGaps}" Content="Soft Seek Gaps"/>
+                            <DockPanel Margin="12,4,4,4" IsEnabled="{Binding Settings.SoftSeekGaps}">
+                                <TextBlock VerticalAlignment="Center" Text="Duration [ms] " Width="100" DockPanel.Dock="Left"/>
+                                <TextBlock Width="40" TextAlignment="Right" DockPanel.Dock="Right" Text="{Binding Settings.SoftSeekGapDuration, Converter={StaticResource MillisecondsConverter}}"/>
+                                <Slider Value="{Binding Settings.SoftSeekGapDuration, Converter={StaticResource MillisecondsConverter}}" VerticalAlignment="Center" DockPanel.Dock="Left"
+                                        Minimum="200" Maximum="10000" TickFrequency="100" IsSnapToTickEnabled="True"/>
+                            </DockPanel>
+                            <CheckBox Margin="4" IsChecked="{Binding Settings.SoftSeekLoops}" Content="Soft Seek Loops"/>
+                            <DockPanel Margin="12,4,4,4" IsEnabled="{Binding Settings.SoftSeekLoops}">
+                                <TextBlock VerticalAlignment="Center" Text="Duration [ms] " Width="100" DockPanel.Dock="Left"/>
+                                <TextBlock Width="40" TextAlignment="Right" DockPanel.Dock="Right" Text="{Binding Settings.SoftSeekLoopsDuration, Converter={StaticResource MillisecondsConverter}}"/>
+                                <Slider Value="{Binding Settings.SoftSeekLoopsDuration, Converter={StaticResource MillisecondsConverter}}" VerticalAlignment="Center" DockPanel.Dock="Left"
+                                        Minimum="200" Maximum="10000" TickFrequency="100" IsSnapToTickEnabled="True"/>
+                            </DockPanel>
+                        </StackPanel>
+                    </Grid>
+                    <Grid controls:PageSelector.ContentIdentifier="Gaps">
+                        <controls:PageSelector.Header>
+                            <controls:AwesomeIcon Icon="Forward_Solid"/>
+                        </controls:PageSelector.Header>
+                        <StackPanel>
+                            <TextBlock>A "gap" is whenever two script actions are more than 10 seconds appart.</TextBlock>
+                            <CheckBox Margin="4" IsChecked="{Binding Settings.AutoSkip}" Content="Auto-skip gaps"/>
+                            <CheckBox Margin="4" IsChecked="{Binding Settings.ShowSkipButton}" Content="Show Skip Button"/>
+                            <CheckBox Margin="4" IsChecked="{Binding Settings.FillGaps}" Content="Fill gaps with movement"/>
+                            <CheckBox Margin="12,4,4,4" IsEnabled="{Binding Settings.FillGaps}" IsChecked="{Binding Settings.ShowFilledGapsInHeatMap}" Content="Show filled gaps in heat map"/>
+                            <CheckBox Margin="12,4,4,4" IsEnabled="{Binding Settings.FillGaps}" IsChecked="{Binding Settings.FillFirstGap}" Content="Fill gap before first action"/>
+                            <CheckBox Margin="12,4,4,4" IsEnabled="{Binding Settings.FillGaps}" IsChecked="{Binding Settings.FillLastGap}" Content="Fill gap after last action"/>
+                            <DockPanel Margin="12,4,4,4" IsEnabled="{Binding Settings.FillGaps}">
+                                <TextBlock VerticalAlignment="Center" Text="Spacing before/after gap [ms] " Width="170" DockPanel.Dock="Left"/>
+                                <TextBlock Width="40" TextAlignment="Right" DockPanel.Dock="Right" Text="{Binding Settings.FillGapGap, Converter={StaticResource MillisecondsConverter}}"/>
+                                <Slider Value="{Binding Settings.FillGapGap, Converter={StaticResource MillisecondsConverter}}" VerticalAlignment="Center" DockPanel.Dock="Left"
+                                        Minimum="0" Maximum="20000" TickFrequency="50" IsSnapToTickEnabled="True"/>
+                            </DockPanel>
+                            <DockPanel Margin="12,4,4,4" IsEnabled="{Binding Settings.FillGaps}">
+                                <TextBlock VerticalAlignment="Center" Text="Filler Intervall [ms] " Width="170" DockPanel.Dock="Left"/>
+                                <TextBlock Width="40" TextAlignment="Right" DockPanel.Dock="Right" Text="{Binding Settings.FillGapIntervall, Converter={StaticResource MillisecondsConverter}}"/>
+                                <Slider Value="{Binding Settings.FillGapIntervall, Converter={StaticResource MillisecondsConverter}}" VerticalAlignment="Center" DockPanel.Dock="Left"
+                                        Minimum="100" Maximum="10000" TickFrequency="20" IsSnapToTickEnabled="True"/>
+                            </DockPanel>
+                        </StackPanel>
+                    </Grid>
+                    <Grid controls:PageSelector.ContentIdentifier="Timings">
+                        <controls:PageSelector.Header>
+                            <controls:AwesomeIcon Icon="Clock_Regular"/>
+                        </controls:PageSelector.Header>
+                        <StackPanel>
+                            <DockPanel Margin="4" ToolTip="Timespan by which every script command will be delayed. Negative values will cause the commands to be executed ahead of time.">
+                                <TextBlock Style="{StaticResource SettingName}" Text="Script Delay"/>
+                                <TextBlock Style="{StaticResource SettingValue}" Text="{Binding Path=Settings.ScriptDelay, Converter={StaticResource MillisecondsConverter}, StringFormat={}{0:f0} ms}"/>
+                                <Slider Value="{Binding Path=Settings.ScriptDelay, Converter={StaticResource MillisecondsConverter}}" Margin="0,4" Minimum="-2500" Maximum="2500" SmallChange="25" LargeChange="100"  IsSnapToTickEnabled="True" TickFrequency="25"/>
+                            </DockPanel>
+
+                            <DockPanel Margin="4" ToolTip="Minimal delay between two script commands">
+                                <TextBlock Style="{StaticResource SettingName}" Text="Min Command Delay"/>
+                                <TextBlock Style="{StaticResource SettingValue}" Text="{Binding Path=Settings.CommandDelay, Converter={StaticResource MillisecondsConverter}, StringFormat={}{0:f0} ms}"/>
+                                <Slider LargeChange="5" Margin="0,4" Minimum="1" Maximum="250"  Value="{Binding Path=Settings.CommandDelay, Converter={StaticResource MillisecondsConverter}}"  SmallChange="1"  IsSnapToTickEnabled="True" TickFrequency="1"/>
+                            </DockPanel>
+                        </StackPanel>
+                    </Grid>
+                    <Grid controls:PageSelector.ContentIdentifier="Favourite Folders">
+                        <controls:PageSelector.Header>
+                            <controls:AwesomeIcon Icon="Star_Regular"/>
+                        </controls:PageSelector.Header>
+
+                        <TextBlock Margin="10,10,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" TextWrapping="Wrap" Text="Here you can manage all folders you regularly use, e.g. to move files to or load scripts from. Double-click entries to edit them."></TextBlock>
+                        <ListBox Margin="10,47,10,38" ItemsSource="{Binding Settings.FavouriteFolders}" SelectedItem="{Binding SelectedFavouriteFolder}">
+                            <ListBox.Resources>
+                                <Style TargetType="{x:Type ListBoxItem}">
+                                    <EventSetter Event="MouseDoubleClick" Handler="FavouriteFoldersEntry_MouseDoubleClick"/>
+                                </Style>
+                                <DataTemplate DataType="{x:Type viewModels:FavouriteFolder}">
+                                    <TextBlock Text="{Binding Name}" ToolTip="{Binding Path}" HorizontalAlignment="Stretch">
+                                        <TextBlock.Style>
+                                            <Style TargetType="TextBlock">
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding IsDefault}" Value="True">
+                                                        <Setter Property="FontWeight" Value="Bold"/>
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </TextBlock.Style>
+                                    </TextBlock>
+                                </DataTemplate>
+                            </ListBox.Resources>
+                        </ListBox>
+
+                        <Button Content="+" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,38,10" Width="23" Click="BtnAddFolder_Click" Height="23"/>
+                        <Button Content="-" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,10" Width="23" Click="BtnRemoveFolder_Click" Height="23"/>
+                    </Grid>
+                    <Grid controls:PageSelector.ContentIdentifier="Paths">
+                        <controls:PageSelector.Header>
+                            <controls:AwesomeIcon Icon="Folder_Regular"/>
+                        </controls:PageSelector.Header>
+
+                        <TextBlock Margin="10,10,10,0" VerticalAlignment="Top" HorizontalAlignment="Stretch" TextWrapping="Wrap" Text="If you don't want to keep all your files (e.g. scripts and videos) in the same directory, you can specify additional paths for ScriptPlayer to search matching files in.&#x0a;Activate the * setting to include all subdirectories too."></TextBlock>
+                        <DataGrid AutoGenerateColumns="False" Margin="10,84,10,38" ItemsSource="{Binding AdditionalPaths}" SelectedItem="{Binding SelectedAdditionalPath}">
+                            <DataGrid.Columns>
+                                <DataGridTextColumn Header="Path" Binding="{Binding Path}" Width="*"/>
+                                <DataGridCheckBoxColumn Header="*" Binding="{Binding IncludeSubDirectories}" MinWidth="30"/>
+                            </DataGrid.Columns>
+                        </DataGrid>
+
+                        <Button Content="+" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,38,10" Width="23" Click="BtnAddPath_Click" Height="23"/>
+                        <Button Content="-" HorizontalAlignment="Right" VerticalAlignment="Bottom" Margin="0,0,10,10" Width="23" Click="BtnRemovePath_Click" Height="23"/>
+                    </Grid>
+                    <Grid controls:PageSelector.ContentIdentifier="Playlist">
+                        <controls:PageSelector.Header>
+                            <controls:AwesomeIcon Icon="List_Solid"/>
+                        </controls:PageSelector.Header>
+                        <StackPanel>
+                            <CheckBox Margin="4" Content="Remember" IsChecked="{Binding Settings.RememberPlaylist}"/>
+                            <CheckBox Margin="4" Content="Shuffle" IsChecked="{Binding Settings.ShufflePlaylist}"/>
+                            <CheckBox Margin="4" Content="Repeat" IsChecked="{Binding Settings.RepeatPlaylist}"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid controls:PageSelector.ContentIdentifier="Remember">
+                        <controls:PageSelector.Header>
+                            <controls:AwesomeIcon Icon="Question_Solid"/>
+                        </controls:PageSelector.Header>
+                        <StackPanel>
+                            <CheckBox Margin="4" Content="Playlist" IsChecked="{Binding Settings.RememberPlaylist}"/>
+                            <CheckBox Margin="4" Content="Volume" IsChecked="{Binding Settings.RememberVolume}"/>
+                            <CheckBox Margin="4" Content="Playback Mode" IsChecked="{Binding Settings.RememberPlaybackMode}"/>
+                            <CheckBox Margin="4" Content="Window Position" IsChecked="{Binding Settings.RememberWindowPosition}"/>
+                        </StackPanel>
+                    </Grid>
+                </controls:PageSelector.Elements>
+            </controls:PageSelector>
+            <TextBlock FontSize="16" FontWeight="SemiBold" Grid.Column="2" HorizontalAlignment="Left" Margin="0,10,0,0" TextWrapping="Wrap" Text="{Binding SettingsTitle}" VerticalAlignment="Top" Width="414"/>
+            <TextBox Grid.Column="0" Text="{Binding Path=Filter, UpdateSourceTrigger=PropertyChanged}"  HorizontalAlignment="Left" Height="23" Margin="10,10,0,0" TextWrapping="Wrap" VerticalAlignment="Top" Width="190"/>
+        </Grid>
+
+        <Grid Grid.Column="0" Grid.Row="1" Background="LightGray">
+            <Button Content="Reset" Click="BtnReset_OnClick" HorizontalAlignment="Left" Margin="10,10,0,10" VerticalAlignment="Bottom" Width="75"/>
+            <Button Content="Ok" Click="BtnOk_OnClick" IsDefault="True" HorizontalAlignment="Right" Margin="0,10,90,10" VerticalAlignment="Bottom" Width="75"/>
+            <Button Content="Cancel" IsCancel="True" HorizontalAlignment="Right" Margin="0,10,10,10" VerticalAlignment="Bottom" Width="75"/>
+        </Grid>
+    </Grid>
+</Window>
+
+
+
+
+
+
+

@@ -1,0 +1,21 @@
+﻿<Window x:Class="ScriptPlayer.Dialogs.ScriptDownloadDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:ScriptPlayer.Dialogs"
+        mc:Ignorable="d" DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        Title="Download Scripts" Height="300" Width="300">
+    <Grid>
+        <ScrollViewer HorizontalScrollBarVisibility="Disabled" VerticalScrollBarVisibility="Visible" Margin="0,0,0,39">
+            <ItemsControl ItemsSource="{Binding Scripts}">
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate DataType="{x:Type local:ScriptViewModel}">
+                        <CheckBox IsChecked="{Binding IsSelected}" Content="{Binding Name}" ToolTip="{Binding DownloadUrl}"/>
+                    </DataTemplate>
+                </ItemsControl.ItemTemplate>
+            </ItemsControl>
+        </ScrollViewer>
+        <Button Name="btnDownload" Click="BtnDownload_OnClick" IsEnabled="false" Content="Download" Margin="10,0,10,7" VerticalAlignment="Bottom"/>
+    </Grid>
+</Window>
